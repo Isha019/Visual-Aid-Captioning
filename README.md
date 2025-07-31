@@ -1,1 +1,2 @@
 # Visual-Aid-Captioning
+This project is an AI-powered Visual Aid Captioning System designed to generate human-like captions for uploaded images. It uses a Convolutional Neural Network (Xception) for feature extraction and a Recurrent Neural Network (LSTM) for generating textual descriptions. The system is wrapped in a Flask web application and runs inside a Python virtual environment for dependency isolation.
