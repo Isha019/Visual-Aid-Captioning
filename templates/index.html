@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Visual Aid Captioning</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  
+  <style>
+    body {
+      padding-top: 30px;
+      background-color: #f9f9f9;
+    }
+    .error-msg {
+      color: red;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+  </style>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const fileInput = document.getElementById("fileInput");
+      const submitBtn = document.getElementById("submitBtn");
+      const errorBox = document.getElementById("error-message");
+
+      function speak(text) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        speechSynthesis.speak(utterance);
+      }
+
+      document.addEventListener("keydown", function (e) {
+        if (e.key === 'q') {
+          speak("Please select an image to upload.");
+          setTimeout(() => fileInput.click(), 400);
+        } else if (e.key === 'a') {
+          if (!fileInput.files.length) {
+            errorBox.textContent = "❗ Please upload an image before generating caption.";
+            speak("Please upload an image before generating caption.");
+          } else {
+            errorBox.textContent = "";
+            speak("Generating caption now.");
+            setTimeout(() => submitBtn.form.submit(), 400);
+          }
+        } else if (e.key === 'z') {
+          const caption = document.getElementById("captionText")?.innerText;
+          if (caption) {
+            speak(caption);
+          } else {
+            speak("No caption available yet.");
+          }
+        }
+      });
+
+      window.speakCaption = function () {
+        const caption = document.getElementById("captionText")?.innerText;
+        if (caption) speak(caption);
+        else speak("No caption available yet.");
+      };
+    });
+  </script>
+</head>
+
+<body>
+  <div class="container">
+    <h1 class="jumbotron bg-primary text-center text-white">Visual Aid Captioning</h1>
+    
+    <form class="form-horizontal" action="/submit" method="post" enctype="multipart/form-data">
+      <div class="form-group">
+        <label class="control-label col-sm-2" for="fileInput">Upload Your Image:</label>
+        <div class="col-sm-10">          
+          <input type="file" class="form-control" name="my_image" id="fileInput" accept="image/*" required>
+          <div id="error-message" class="error-msg"></div>
+        </div>
+      </div>
+
+      <div class="form-group">        
+        <div class="col-sm-offset-2 col-sm-10">
+          <button type="submit" id="submitBtn" class="btn btn-success">Generate Caption</button>
+        </div>
+      </div>
+    </form>
+
+    {% if prediction %}
+      <div class="text-center">
+        <img src="{{ img_path }}" height="400px" width="400px" class="img-thumbnail">
+        <h3>Predicted Caption:</h3>
+        <h4 id="captionText"><i>{{ prediction }}</i></h4>
+        <button class="btn btn-info" onclick="speakCaption()">🔊 Speak Caption</button>
+      </div>
+    {% endif %}
+
+    <hr>
+    <div class="panel panel-default">
+      <div class="panel-heading"><strong>Keyboard Voice Shortcuts:</strong></div>
+      <div class="panel-body">
+        <ul>
+          <li><strong>Q</strong> – Upload image (will speak)</li>
+          <li><strong>A</strong> – Submit form (validates upload)</li>
+          <li><strong>Z</strong> – Speak generated caption (if available)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
